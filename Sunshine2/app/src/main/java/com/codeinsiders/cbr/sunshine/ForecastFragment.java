@@ -1,5 +1,6 @@
 package com.codeinsiders.cbr.sunshine;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,13 +13,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,6 +89,15 @@ public class ForecastFragment extends Fragment {
         //ListView lv = (ListView) rootView.findViewById(R.id.listview_forecast);
         //lv.setAdapter(mArrayAdapter);
         mListView.setAdapter(mArrayAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String forecast = (String) parent.getItemAtPosition(position);
+                Intent i = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(i);
+            }
+        });
 
         return rootView;
     }
