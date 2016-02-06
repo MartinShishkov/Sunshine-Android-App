@@ -2,8 +2,10 @@ package com.codeinsiders.cbr.sunshine;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +34,21 @@ public class DetailActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.detail, menu);
+
+        MenuItem item = menu.findItem(R.id.action_share);
+        ShareActionProvider provider =
+                (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+
+        String text = getIntent().getStringExtra(Intent.EXTRA_TEXT) + " #Sunshine App";
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        intent.setType("text/plain");
+
+        setShareIntent(provider, intent);
+
         return true;
     }
 
@@ -46,9 +63,20 @@ public class DetailActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(i);
+            return true;
+        }
+
+        if(id == R.id.action_share){
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setShareIntent(ShareActionProvider provider, Intent shareIntent) {
+        if (provider != null) {
+            provider.setShareIntent(shareIntent);
+        }
     }
 
     /**

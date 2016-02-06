@@ -1,9 +1,11 @@
 package com.codeinsiders.cbr.sunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -50,20 +52,34 @@ public class ForecastFragment extends Fragment {
         inflater.inflate(R.menu.forecast_fragment, menu);
     }
 
+    private void updateWeather(){
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+            String units = prefs.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_default));
+            String[] result = new FetchWeatherTask().execute(location, units).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_refresh){
-            try {
-                String[] result = new FetchWeatherTask().execute("94043").get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
+            updateWeather();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     @Override
@@ -132,7 +148,7 @@ public class ForecastFragment extends Fragment {
                         .appendPath("daily")
                         .appendQueryParameter("q", params[0])
                         .appendQueryParameter("mode", "json")
-                        .appendQueryParameter("units", "metric")
+                        .appendQueryParameter("units", params[1])
                         .appendQueryParameter("cnt", "7")
                         .appendQueryParameter("APPID", BuildConfig.OPEN_WEATHER_MAP_API_KEY);
 
